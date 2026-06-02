@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FingerprintJS major-version contract example</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 2rem; max-width: 760px; line-height: 1.6; }
+    pre { background: #111821; color: #eef3f7; overflow-x: auto; padding: 1rem; }
+  </style>
+</head>
+<body>
+  <h1>FingerprintJS major-version contract example</h1>
+  <p>This example shows the application-side contract. Replace the mock collector with the official package version your application uses.</p>
+  <pre id="output">Loading...</pre>
+
+  <script type="module">
+    const output = document.querySelector('#output')
+
+    async function collectBrowserIdentifier() {
+      // Keep package-specific code behind one adapter boundary.
+      // Replace this mock with FingerprintJS.load().then(fp => fp.get()).
+      const packageResult = {
+        visitorId: 'example-visitor-id',
+        version: '5.x',
+        confidence: { score: 0.99 },
+        components: {}
+      }
+
+      return normalizeFingerprintResult(packageResult)
+    }
+
+    function normalizeFingerprintResult(result) {
+      return {
+        provider: 'fingerprintjs',
+        packageVersion: String(result.version || 'unknown'),
+        visitorId: String(result.visitorId || ''),
+        confidenceScore: Number(result.confidence?.score ?? 0),
+        collectedAt: new Date().toISOString()
+      }
+    }
+
+    function assertContract(result) {
+      const required = ['provider', 'packageVersion', 'visitorId', 'confidenceScore', 'collectedAt']
+      for (const key of required) {
+        if (!(key in result)) {
+          throw new Error(`Missing normalized field: ${key}`)
+        }
+      }
+      if (result.provider !== 'fingerprintjs') {
+        throw new Error('Unexpected provider')
+      }
+      if (!result.visitorId) {
+        throw new Error('Missing visitorId')
+      }
+    }
+
+    collectBrowserIdentifier()
+      .then(result => {
+        assertContract(result)
+        output.textContent = JSON.stringify(result, null, 2)
+      })
+      .catch(error => {
+        output.textContent = error instanceof Error ? error.message : String(error)
+      })
+  </script>
+</body>
+</html>

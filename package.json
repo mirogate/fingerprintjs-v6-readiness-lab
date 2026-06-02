@@ -1,0 +1,11 @@
+{
+  "name": "@mirogate/fingerprintjs-v6-readiness-lab",
+  "version": "0.1.0",
+  "private": false,
+  "description": "Unofficial readiness checklist and contract-test lab for future FingerprintJS major upgrades.",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "test": "node scripts/validate.mjs"
+  }
+}
